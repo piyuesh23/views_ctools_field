@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implementation hook_views_api
+ */
+function views_ctools_field_views_api() {
+  return array(
+    'api' => 2,
+  );
+}

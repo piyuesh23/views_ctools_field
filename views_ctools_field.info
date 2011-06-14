@@ -1,0 +1,6 @@
+name = Views Ctools Field
+description = "Exposes ctools content-types to views"
+core = 6.x
+package = Views
+dependencies[] = views
+dependencies[] = ctools
