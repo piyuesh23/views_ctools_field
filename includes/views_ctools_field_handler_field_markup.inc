@@ -11,11 +11,15 @@
  */
 class views_ctools_field_handler_field_markup extends views_handler_field {
   
+  // If this is a global content with no context, rewrite the field_alias so as to select a null column
   function query() {
-    $this->field_alias = 'ctools_field_markup_'. $this->position;
-    
-    $value = db_escape_string($this->options['value']);
-    $this->query->add_field('', "'$value'", $this->field_alias);
+    if ($this->table == 'ctools_field_global') {
+      $this->field_alias = 'ctools_field_markup_'. $this->position;
+      
+      $value = db_escape_string($this->options['value']);
+      $this->query->add_field('', "'$value'", $this->field_alias);
+    }
+    else parent::query();
   }
   
   function option_definition() {
@@ -53,6 +57,8 @@ class views_ctools_field_handler_field_markup extends views_handler_field {
   }
   
   function render($values) {
+    $entity_id = $values->{$this->field_alias};
+    
     ctools_include('plugins');
     ctools_include('context');
     ctools_include('content');
@@ -62,10 +68,9 @@ class views_ctools_field_handler_field_markup extends views_handler_field {
     
     $conf = $this->getCtoolsContentTypeConf();
     
-    //@@TODO: Do this programatically, Allow for selection of node based on relationship / base-table
-    // Also allow for user and term contexts via relationships....
-    if ($values->nid) {
-      $node = node_load($values->nid);
+    //@@TODO: Do this programatically, check wether we are loading nodes, terms or users
+    if ($entity_id) {
+      $node = node_load($entity_id);
       $node_context = ctools_context_create('node', $node);
       $node_context->identifier = t('This node');
       $node_context->keyword = 'node';
