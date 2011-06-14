@@ -52,9 +52,41 @@ function views_ctools_field_views_data() {
       ),
   );
 
+  // Psudo table for content-types that have a user as required context
+  $data['ctools_field_user']['table']['group']  = t('Chaos Tools Field - User');  
+  $data['ctools_field_user']['table']['base'] = array(
+    'field' => 'uid',
+    'title' => t('User'),
+    'help' => t('ctools content with a user context'),
+  );
+  $data['ctools_field_user']['table']['join'] = array(
+      'users' => array(
+        'left_table' => 'users',
+        'left_field' => 'uid',
+        'field' => 'uid',
+        'table' => 'users',
+      ),
+  );
+
+  // Psudo table for content-types that have a term as required context
+  $data['ctools_field_term']['table']['group']  = t('Chaos Tools Field - Term');  
+  $data['ctools_field_term']['table']['base'] = array(
+    'field' => 'tid',
+    'title' => t('Term'),
+    'help' => t('ctools content with a term context'),
+  );
+  $data['ctools_field_term']['table']['join'] = array(
+      'term_data' => array(
+        'left_table' => 'term_data',
+        'left_field' => 'uid',
+        'field' => 'uid',
+        'table' => 'term_data',
+      ),
+  );
+
+  // For each plugin, define a 'column' on a psudo-table
   $plugins = ctools_get_plugins('ctools','content_types');
   
-  // For each plugin, define a 'column' on a psudo-table
   foreach ($plugins as $plugin_id => $plugin) {
     // Determine the base table based on context
     if ($plugin['required context']) {
@@ -62,7 +94,15 @@ function views_ctools_field_views_data() {
         $base_table = 'ctools_field_node';
         $real_field = 'nid';  
       }
-      if ($plugin['required context']->keywords != 'node') continue;  
+      else if ($plugin['required context']->keywords == 'user') {
+        $base_table = 'ctools_field_user';
+        $real_field = 'uid';  
+      }
+      else if ($plugin['required context']->keywords == 'term') {
+        $base_table = 'ctools_field_term';
+        $real_field = 'tid';  
+      }
+      else continue;  
     }
     else {
       $base_table = 'ctools_field_global';
@@ -71,21 +111,15 @@ function views_ctools_field_views_data() {
     
     $data[$base_table][$plugin_id] = array (
       'title' => $plugin['title'],
+      'real field' => $real_field, 
       'field' => array(
         'handler' => 'views_ctools_field_handler_field_markup',
         'click sortable' => FALSE,
-      ), 
+      ),
     );
     if (isset($plugin['description'])) {
       $data[$base_table][$plugin_id]['help'] = $plugin['description'];
     }
-    
-    // The the 'real field' so that these fields actually point at the entity id (nid, uid, and tid)
-    $data[$base_table][$plugin_id]['real field'] = $real_field;
-    if ($real_field) {
-      $data[$base_table][$plugin_id]['real field'] = $real_field;
-    }
-    
   }
     
   return $data;

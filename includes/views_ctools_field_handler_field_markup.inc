@@ -11,8 +11,8 @@
  */
 class views_ctools_field_handler_field_markup extends views_handler_field {
   
-  // If this is a global content with no context, rewrite the field_alias so as to select a null column
   function query() {
+    // If this is a global content with no context, rewrite so as to select a null column
     if ($this->table == 'ctools_field_global') {
       $this->field_alias = 'ctools_field_markup_'. $this->position;
       
@@ -34,9 +34,7 @@ class views_ctools_field_handler_field_markup extends views_handler_field {
     ctools_include('plugins');
     ctools_include('context');
     ctools_include('content');
-    
-    $plugin = $this->options['field'];
-    
+        
     $plugin_id = $this->options['field'];
     $plugin = ctools_get_plugins('ctools','content_types', $this->options['field'], $plugin_id);
     
@@ -44,7 +42,7 @@ class views_ctools_field_handler_field_markup extends views_handler_field {
     if (function_exists($edit_form_callback)) {
       $form['views_ctools_field'] = array(
         '#type' => 'fieldset', 
-        '#title' => t('Ctools Field Settings'), 
+        '#title' => t('@field field settings', array('@field' => $plugin['title'])), 
         '#collapsible' => FALSE, 
         '#collapsed' => FALSE,
         '#tree' => TRUE, 
@@ -70,13 +68,33 @@ class views_ctools_field_handler_field_markup extends views_handler_field {
     
     //@@TODO: Do this programatically, check wether we are loading nodes, terms or users
     if ($entity_id) {
-      $node = node_load($entity_id);
-      $node_context = ctools_context_create('node', $node);
-      $node_context->identifier = t('This node');
-      $node_context->keyword = 'node';
-      
-      $context = array('node' => $node_context);
-      $conf['context'] = 'node';
+      if ($this->table == 'ctools_field_node') {
+        $node = node_load($entity_id);
+        $node_context = ctools_context_create('node', $node);
+        $node_context->identifier = t('This node');
+        $node_context->keyword = 'node';
+        
+        $context = array('node' => $node_context);
+        $conf['context'] = 'node';
+      }
+      if ($this->table == 'ctools_field_user') {
+        $user = user_load($entity_id);
+        $user_context = ctools_context_create('user', $user);
+        $user_context->identifier = t('This user');
+        $user_context->keyword = 'user';
+        
+        $context = array('user' => $user_context);
+        $conf['context'] = 'user';
+      }
+      if ($this->table == 'ctools_field_term') {
+        $term = taxonomy_get_term($entity_id);
+        $term_context = ctools_context_create('term', $term);
+        $term_context->identifier = t('This term');
+        $term_context->keyword = 'term';
+        
+        $context = array('term' => $term_context);
+        $conf['context'] = 'term';
+      }
       
       $ctools_content = ctools_content_render($plugin_id, $plugin_id, $conf, array(), array(), $context);
     }
