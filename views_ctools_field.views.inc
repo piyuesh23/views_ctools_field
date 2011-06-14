@@ -66,7 +66,7 @@ function views_ctools_field_views_data() {
     }
     else {
       $base_table = 'ctools_field_global';
-      $real_field = '';
+      $real_field = NULL;
     }
     
     $data[$base_table][$plugin_id] = array (
@@ -82,16 +82,11 @@ function views_ctools_field_views_data() {
     
     // The the 'real field' so that these fields actually point at the entity id (nid, uid, and tid)
     $data[$base_table][$plugin_id]['real field'] = $real_field;
-    #if ($real_field) {
-    #  $data[$base_table][$plugin_id]['real field'] = $real_field;
-    #}
-    #else {
-    #  $data[$base_table][$plugin_id]['field']['notafield'] = TRUE;
-    #}
+    if ($real_field) {
+      $data[$base_table][$plugin_id]['real field'] = $real_field;
+    }
     
   }
-  
-  dpm($data);
-  
+    
   return $data;
 }
