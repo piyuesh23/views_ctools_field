@@ -1,6 +1,7 @@
 name = Views Ctools Field
 description = "Exposes ctools content-types to views"
-core = 6.x
+core = 7.x
 package = Views
 dependencies[] = views
 dependencies[] = ctools
+files[] = includes/views_ctools_field_handler_field.inc

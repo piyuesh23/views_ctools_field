@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implementation hook_views_api
+ * Implements hook_views_api().
  */
 function views_ctools_field_views_api() {
   return array(
@@ -22,7 +22,7 @@ function views_ctools_field_context_config($id = NULL) {
     'id' => 'node',
     'title' => t('Chaos Tools Content - Node'),
     'table' => 'node',
-    'key' => 'nid', 
+    'key' => 'nid',
     'load' => 'node_load',
   );
   $config['user'] = array(
@@ -30,20 +30,22 @@ function views_ctools_field_context_config($id = NULL) {
     'title' => t('Chaos Tools Content - User'),
     'table' => 'users',
     'key' => 'uid',
-    'load' => 'user_load', 
+    'load' => 'user_load',
   );
   $config['term'] = array(
     'id' => 'term',
     'title' => t('Chaos Tools Content - Term'),
-    'table' => 'term_data',
+    'table' => 'taxonomy_term_data',
     'key' => 'tid',
-    'load' => 'taxonomy_get_term'
+    'load' => 'taxonomy_get_term',
   );
-  
+
   if ($id) {
     if (array_key_exists($id, $config)) {
       return $config[$id];
     }
   }
-  else return $config;
+  else {
+    return $config;
+  }
 }
